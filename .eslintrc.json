@@ -1,0 +1,19 @@
+{
+	"extends": "airbnb-base",
+	
+	"rules": {
+		"indent": ["error", 4],
+		"linebreak-style": "off"
+	},
+	"settings": {
+		"import/resolver": {
+		  "alias": {
+        "map": [
+					["config", "./config"],
+					["helper", "./helper"]
+        ],
+        "extensions": [".js", ".json"]
+      }
+		}
+	}
+}

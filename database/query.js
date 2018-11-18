@@ -1,17 +1,17 @@
-var pool = require('./pool.js');
+const pool = require('./pool.js');
 
-module.exports = function (query, req, res) {
-    pool.getConnection(function(err, connection) {
+module.exports = (query, req, res) => {
+    pool.getConnection((err, connection) => {
         if (err) {
             connection.release();
             throw err;
         }
-        
-        connection.query(query, function (error, results, fields) {
+
+        connection.query(query, (error, results) => {
             if (error) throw error;
             res.send(results);
         });
 
         connection.release();
     });
-}
+};

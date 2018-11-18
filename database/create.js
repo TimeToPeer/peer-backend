@@ -1,14 +1,13 @@
-var mysql = require('mysql');
+const mysql = require('mysql');
 const { db } = require('../config/conf.json');
 
-var connection = mysql.createConnection(db);
+const connection = mysql.createConnection(db);
 
-connection.connect(function(err) {
+connection.connect((err) => {
     if (err) throw err;
-    console.log("Connected!");
-
+    let sql = '';
     // create users table
-    var sql = `
+    sql = `
         CREATE TABLE IF NOT EXISTS users (
             id INT NOT NULL AUTO_INCREMENT,
             username VARCHAR(64) NOT NULL,
@@ -21,13 +20,12 @@ connection.connect(function(err) {
             personality VARCHAR(32) NULL,
         PRIMARY KEY(id))
     `;
-    connection.query(sql, function (err, result) {
-        if (err) throw err;
-        console.log("users table created");
+    connection.query(sql, (queryErr) => {
+        if (queryErr) throw err;
     });
 
     // create classroom table
-    var sql = `
+    sql = `
         CREATE TABLE IF NOT EXISTS classroom (
             id VARCHAR(32) NOT NULL,
             teacher_id INT NOT NULL,
@@ -35,13 +33,12 @@ connection.connect(function(err) {
         PRIMARY KEY(id))
     `;
 
-    connection.query(sql, function (err, result) {
-        if (err) throw err;
-        console.log("class_code table created");
+    connection.query(sql, (queryErr) => {
+        if (queryErr) throw err;
     });
 
     // create quests
-    var sql = `
+    sql = `
         CREATE TABLE IF NOT EXISTS quests (
             id INT NOT NULL AUTO_INCREMENT,
             class_code VARCHAR(32) NOT NULL,
@@ -51,11 +48,9 @@ connection.connect(function(err) {
         PRIMARY KEY(id))
     `;
 
-    connection.query(sql, function (err, result) {
-        if (err) throw err;
-        console.log("quest table created");
+    connection.query(sql, (queryErr) => {
+        if (queryErr) throw err;
     });
-    
 
     connection.end();
 });
