@@ -6,5 +6,5 @@
         "password": "dannys517",
         "database": "peer"
     },
-    "salt": "notarealsalt"
+    "key": "notarealkey"
 }
