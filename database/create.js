@@ -11,7 +11,7 @@ connection.connect((err) => {
         CREATE TABLE IF NOT EXISTS users (
             id INT NOT NULL AUTO_INCREMENT,
             username VARCHAR(64) NOT NULL,
-            password VARCHAR(32) NOT NULL,
+            password VARCHAR(256) NOT NULL,
             create_time TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
             icon VARCHAR(64) NULL,
             type INT NULL,
