@@ -23,9 +23,10 @@ app.use((req, res, next) => {
         if (req.url.indexOf('/post/users/create_account') > -1) {
             next();
         } else {
-            jwt.verify(req.body.token, config.key, (err, decoded) => {
-                if (err) res.send({ success: false });
-                if (decoded) next();
+            const token = req.headers.authorization;
+            jwt.verify(token, config.key, (err, decoded) => {
+                if (err) res.send({ success: false }); console.log(err);
+                if (decoded) res.userName = decoded.userName; next();
             });
         }
     } else {

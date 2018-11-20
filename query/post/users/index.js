@@ -5,7 +5,7 @@ const pool = require('../../../database/pool.js');
 const conf = require('../../../config/conf');
 
 const router = express.Router();
-// const queryDb = require('../../../database/query');
+const queryDb = require('../../../database/query');
 
 // middleware that is specific to this router
 router.use((req, res, next) => {
@@ -71,6 +71,15 @@ router.post('/create_account', (req, res) => {
             }
         });
     });
+});
+
+router.post('/update_account', (req, res) => {
+    const {
+        name, class_code: classCode, school_code: schoolCode, personality,
+    } = req.body.userInfo;
+
+    const query = `UPDATE users SET name='${name}', class_code='${classCode}', school_code='${schoolCode}', personality='${personality}' WHERE username='${res.userName}'`;
+    queryDb(query, req, res);
 });
 
 

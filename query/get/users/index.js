@@ -10,7 +10,7 @@ router.use((req, res, next) => {
 });
 
 router.get('/:id', (req, res) => {
-    const query = `SELECT * FROM users WHERE username='${req.params.id}' LIMIT 0,1`;
+    const query = `SELECT name, class_code, school_code, personality, type, icon FROM users WHERE username='${req.params.id}' LIMIT 0,1`;
     queryDb(query, req, res);
 });
 
