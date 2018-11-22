@@ -54,7 +54,7 @@ connection.connect((err) => {
     });
 
     sql = `
-        CREATE TABLE IF NOT EXISTS peer.qeust_entries (
+        CREATE TABLE IF NOT EXISTS peer.quest_entries (
             id int not null AUTO_INCREMENT,
             created_by int not null,
             created_on timestamp null default current_timestamp,
