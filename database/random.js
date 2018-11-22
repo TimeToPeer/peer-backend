@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const { db } = require('../config/conf.json');
 const mainHelper = require('../helper/main-helper');
+
 const connection = mysql.createConnection(db);
 
 connection.connect((err) => {
@@ -17,7 +18,7 @@ connection.connect((err) => {
         for (let i = 0; i < 1; i += 1) {
             sql = `INSERT INTO users (username, password, type, class_code, school_code, personality, name) 
                     VALUES ('test.teacher1', '${hashedPassword}', '1', '1000', '1000', 'test', 'test teacher1')`;
-            
+
             connection.query(sql, (err2, result) => {
                 if (err2) throw err2;
                 console.log(err2, result);
