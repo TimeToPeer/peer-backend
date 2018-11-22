@@ -5,7 +5,9 @@ const jwt = require('jsonwebtoken');
 
 const app = express();
 const getUsers = require('./query/get/users');
+const getQuests = require('./query/get/quests');
 const postUsers = require('./query/post/users');
+const postQuests = require('./query/post/quests');
 const config = require('./config/conf');
 
 app.use(bodyParser.json());
@@ -25,8 +27,15 @@ app.use((req, res, next) => {
         } else {
             const token = req.headers.authorization;
             jwt.verify(token, config.key, (err, decoded) => {
-                if (err) res.send({ success: false }); console.log(err);
-                if (decoded) res.userName = decoded.userName; next();
+                try {
+                    if (err) throw err;
+                    if (decoded) res.userName = decoded.userName; next();
+                } catch (e) {
+                    res.statusMessage = err.name;
+                    res.status(400).send({
+                        success: false,
+                    });
+                }
             });
         }
     } else {
@@ -35,7 +44,9 @@ app.use((req, res, next) => {
 });
 
 app.use('/get/users', getUsers);
+app.use('/get/quests', getQuests);
 app.use('/post/users', postUsers);
+app.use('/post/quests', postQuests);
 
 app.listen(8080, () => {});
 

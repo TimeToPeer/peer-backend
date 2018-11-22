@@ -9,8 +9,8 @@ router.use((req, res, next) => {
     next();
 });
 
-router.get('/:id', (req, res) => {
-    const query = `SELECT name, class_code, school_code, personality, type, icon FROM users WHERE username='${req.params.id}' LIMIT 0,1`;
+router.post('/', (req, res) => {
+    const query = `SELECT name, class_code, school_code, personality, type, icon FROM users WHERE username='${res.userName}' LIMIT 0,1`;
     queryDb(query, req, res);
 });
 

@@ -13,7 +13,7 @@ router.use((req, res, next) => {
     next();
 });
 
-const createJwt = obj => jwt.sign(obj, conf.key, { expiresIn: '1h' });
+const createJwt = obj => jwt.sign(obj, conf.key, { expiresIn: '5h' });
 
 
 router.post('/create_account', (req, res) => {
@@ -75,11 +75,21 @@ router.post('/create_account', (req, res) => {
 
 router.post('/update_account', (req, res) => {
     const {
-        name, class_code: classCode, school_code: schoolCode, personality,
-    } = req.body.userInfo;
-
-    const query = `UPDATE users SET name='${name}', class_code='${classCode}', school_code='${schoolCode}', personality='${personality}' WHERE username='${res.userName}'`;
+        name, class_code: classCode, school_code: schoolCode, personality, icon,
+    } = req.body;
+    const query = `UPDATE users SET name='${name}', class_code='${classCode}', school_code='${schoolCode}', personality='${personality}', icon='${icon}' WHERE username='${res.userName}'`;
     queryDb(query, req, res);
+});
+
+router.post('/logout_user', (req, res) => {
+    const token = req.headers.authorization;
+    const payload = jwt.verify(token, conf.key);
+    delete payload.iat;
+    delete payload.exp;
+    delete payload.nbf;
+    delete payload.jti;
+
+    res.send({ success: true, message: 'logout successful' });
 });
 
 

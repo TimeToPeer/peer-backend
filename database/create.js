@@ -11,9 +11,10 @@ connection.connect((err) => {
         CREATE TABLE IF NOT EXISTS users (
             id INT NOT NULL AUTO_INCREMENT,
             username VARCHAR(64) NOT NULL,
+            name VARCHAR(256) NOT NULL,
             password VARCHAR(256) NOT NULL,
             create_time TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-            icon VARCHAR(64) NULL,
+            icon VARCHAR(64) DEFAULT 0,
             type INT NULL,
             class_code VARCHAR(32) NULL,
             school_code INT NULL,
@@ -52,5 +53,20 @@ connection.connect((err) => {
         if (queryErr) throw err;
     });
 
+    sql = `
+        CREATE TABLE IF NOT EXISTS peer.qeust_entries (
+            id int not null AUTO_INCREMENT,
+            created_by int not null,
+            created_on timestamp null default current_timestamp,
+            class_code varchar(32) not null,
+            quest_id int not null,
+            entry text not null,
+            edited_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        Primary key(id))
+    `;
+
+    connection.query(sql, (queryErr) => {
+        if (queryErr) throw err;
+    });
     connection.end();
 });
