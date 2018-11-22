@@ -15,16 +15,16 @@ connection.connect((err) => {
 
     mainHelper.createSaltHashPassword('password').then((hashedPassword) => {
         for (let i = 0; i < 1; i += 1) {
-            sql = `INSERT INTO users (username, password, type, class_code, school_code, personality) 
-                    VALUES ('test.teacher1', '${hashedPassword}', '1', '1000', '1000', 'test')`;
+            sql = `INSERT INTO users (username, password, type, class_code, school_code, personality, name) 
+                    VALUES ('test.teacher1', '${hashedPassword}', '1', '1000', '1000', 'test', 'test teacher1')`;
             
             connection.query(sql, (err2, result) => {
                 if (err2) throw err2;
                 console.log(err2, result);
             });
 
-            sql = `INSERT INTO users (username, password, type, class_code, school_code, personality) 
-                    VALUES ('test.teacher1', '${hashedPassword}', '1', '1001', '1000', 'test')`;
+            sql = `INSERT INTO users (username, password, type, class_code, school_code, personality, name) 
+                    VALUES ('test.teacher2', '${hashedPassword}', '1', '1001', '1000', 'test', 'test teacher1')`;
 
             connection.query(sql, (err3, result) => {
                 if (err3) throw err3;
@@ -34,9 +34,10 @@ connection.connect((err) => {
 
         for (let j = 0; j < 60; j += 1) {
             const name = `test.student${j}`;
+            const nn = `test student${j}`;
             const classCode = j < 30 ? '1000' : '1001';
-            sql = `INSERT INTO users (username, password, type, class_code, school_code, personality) 
-                    VALUES ('${name}', '${hashedPassword}', '2', '${classCode}', '1000', 'test')`;
+            sql = `INSERT INTO users (username, password, type, class_code, school_code, personality, name) 
+                    VALUES ('${name}', '${hashedPassword}', '2', '${classCode}', '1000', 'test', '${nn}')`;
 
             connection.query(sql, (err4, result) => {
                 if (err4) throw err4;
