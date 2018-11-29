@@ -61,12 +61,30 @@ connection.connect((err) => {
             class_code varchar(32) not null,
             quest_id int not null,
             entry text not null,
-            edited_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            image text not null,
+            critical int not null,
+            creative int not null,
+            responsible int not null,
         Primary key(id))
     `;
 
     connection.query(sql, (queryErr) => {
         if (queryErr) throw err;
     });
+
+    sql = `
+        CREATE TABLE IF NOT EXISTS peer.quest_comments (
+            id int not null AUTO_INCREMENT,
+            created_by int not null,
+            created_on timestamp null default current_timestamp,
+            quest_entry_id int not null,
+            comment VARCHAR(2000) not null,
+        Primary key(id))
+    `;
+
+    connection.query(sql, (queryErr) => {
+        if (queryErr) throw err;
+    });
+
     connection.end();
 });

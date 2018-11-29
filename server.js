@@ -10,8 +10,8 @@ const postUsers = require('./query/post/users');
 const postQuests = require('./query/post/quests');
 const config = require('./config/conf');
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '6mb' }));
+app.use(bodyParser.urlencoded({ limit: '6mb', extended: true }));
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
