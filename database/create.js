@@ -61,7 +61,7 @@ connection.connect((err) => {
             class_code varchar(32) not null,
             quest_id int not null,
             entry text not null,
-            image text not null,
+            image MEDIUMTEXT not null,
             critical int not null,
             creative int not null,
             responsible int not null,
