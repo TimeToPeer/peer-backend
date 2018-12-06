@@ -89,6 +89,10 @@ connection.connect((err) => {
         Primary key(id))
     `;
 
+    connection.query(sql, (queryErr) => {
+        if (queryErr) throw err;
+    });
+
     // create teacher feedback
 
     sql = `

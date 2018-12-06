@@ -179,7 +179,7 @@ router.post('/classroom', async (req, res) => {
                 GROUP BY q.created_by
             `;
             const query2 = `
-                SELECT id, name FROM USERS
+                SELECT id, name FROM users
                 WHERE username != '${res.userName}' AND class_code = '${classCode}'
             `;
             const query3 = `
