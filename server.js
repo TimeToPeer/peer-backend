@@ -29,7 +29,11 @@ app.use((req, res, next) => {
             jwt.verify(token, config.key, (err, decoded) => {
                 try {
                     if (err) throw err;
-                    if (decoded) res.userName = decoded.userName; next();
+                    if (decoded) {
+                        res.userName = decoded.userName;
+                        res.type = decoded.type;
+                        next();
+                    }
                 } catch (e) {
                     res.statusMessage = err.name;
                     res.status(400).send({

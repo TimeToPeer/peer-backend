@@ -10,7 +10,7 @@ router.use((req, res, next) => {
 });
 
 router.post('/', (req, res) => {
-    const query = `SELECT name, class_code, school_code, personality, type, icon FROM users WHERE username='${res.userName}' LIMIT 0,1`;
+    const query = `SELECT id, name, class_code, school_code, personality, type, icon FROM users WHERE username='${res.userName}' LIMIT 0,1`;
     queryDb(query, req, res);
 });
 

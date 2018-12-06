@@ -10,7 +10,7 @@ connection.connect((err) => {
     sql = `
         CREATE TABLE IF NOT EXISTS users (
             id INT NOT NULL AUTO_INCREMENT,
-            username VARCHAR(64) NOT NULL,
+            username VARCHAR(64) NOT NULL UNIQUE,
             name VARCHAR(256) NOT NULL,
             password VARCHAR(256) NOT NULL,
             create_time TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
@@ -46,6 +46,7 @@ connection.connect((err) => {
             title VARCHAR(64) NOT NULL,
             description TEXT NOT NULL,
             create_time TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+            active TINYINT(1) NOT NULL,
         PRIMARY KEY(id))
     `;
 
@@ -53,6 +54,7 @@ connection.connect((err) => {
         if (queryErr) throw err;
     });
 
+    // create quest entry table
     sql = `
         CREATE TABLE IF NOT EXISTS peer.quest_entries (
             id int not null AUTO_INCREMENT,
@@ -65,12 +67,17 @@ connection.connect((err) => {
             critical int not null,
             creative int not null,
             responsible int not null,
+            teacher_critical int null,
+            teacher_creative int null,
+            teacher_responsible int null,
         Primary key(id))
     `;
 
     connection.query(sql, (queryErr) => {
         if (queryErr) throw err;
     });
+
+    // create quest entry comment table
 
     sql = `
         CREATE TABLE IF NOT EXISTS peer.quest_comments (
@@ -80,6 +87,18 @@ connection.connect((err) => {
             quest_entry_id int not null,
             comment VARCHAR(2000) not null,
         Primary key(id))
+    `;
+
+    // create teacher feedback
+
+    sql = `
+        CREATE TABLE IF NOT EXISTS peer.feedback (
+            id int not null AUTO_INCREMENT,
+            created_by int not null,
+            created_on timestamp null default current_timestamp,
+            quest_entry_id int not null,
+            comment VARCHAR(2000) not null,
+        PRIMARY KEY(id))
     `;
 
     connection.query(sql, (queryErr) => {

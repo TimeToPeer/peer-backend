@@ -34,8 +34,8 @@ connection.connect((err) => {
         }
 
         for (let j = 0; j < 60; j += 1) {
-            const name = `test.student${j}`;
-            const nn = `test student${j}`;
+            const name = `test.user${j}`;
+            const nn = `test user${j}`;
             const classCode = j < 30 ? '1000' : '1001';
             sql = `INSERT INTO users (username, password, type, class_code, school_code, personality, name) 
                     VALUES ('${name}', '${hashedPassword}', '2', '${classCode}', '1000', 'test', '${nn}')`;

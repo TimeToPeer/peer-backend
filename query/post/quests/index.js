@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const queryDb = require('../../../database/query');
 const pool = require('../../../database/pool');
+const awaitQuery = require('../../../database/awaitQuery');
 
 // middleware that is specific to this router
 router.use((req, res, next) => {
@@ -56,6 +57,47 @@ router.post('/comment/submit', (req, res) => {
 
         connection.release();
     });
+});
+
+router.post('/assessment/feedback', async (req, res) => {
+    const {
+        id, critical, creative, responsible, comment,
+    } = req.body;
+    const query = `
+        UPDATE quest_entries
+        SET teacher_critical = ${Number(critical)}, teacher_creative = ${Number(creative)}, teacher_responsible = ${Number(responsible)}
+        WHERE id = '${id}'
+    `;
+    const query2 = `
+        INSERT INTO feedback (created_by, quest_entry_id, comment)
+        SELECT id, '${id}', '${comment}'
+        FROM users where username = '${res.userName}'
+    `;
+    try {
+        let entry = {};
+        if (critical > 0 && creative > 0 && responsible > 0) {
+            await awaitQuery.query(query);
+            const query4 = `
+                SELECT *
+                FROM quest_entries
+                WHERE id = '${id}'
+            `;
+            entry = await awaitQuery.query(query4);
+        }
+        const result = await awaitQuery.query(query2);
+        const query3 = `SELECT q.*, u.name, u.icon
+            FROM feedback q
+            JOIN users u on u.id = q.created_by
+            WHERE q.id = ${result.insertId}
+        `;
+        const result2 = await awaitQuery.query(query3);
+        res.send({
+            feedback: result2,
+            entry,
+        });
+    } catch (err) {
+        throw new Error(err);
+    }
 });
 
 module.exports = router;

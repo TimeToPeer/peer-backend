@@ -18,7 +18,7 @@ const createJwt = obj => jwt.sign(obj, conf.key, { expiresIn: '5h' });
 
 router.post('/create_account', (req, res) => {
     const { userName, password } = req.body;
-    const query1 = `SELECT password FROM users where username = '${userName}'`;
+    const query1 = `SELECT password, type FROM users where username = '${userName}'`;
     pool.getConnection((err, connection) => {
         if (err) {
             connection.release();
@@ -33,8 +33,11 @@ router.post('/create_account', (req, res) => {
             }
             if (results && results[0]) {
                 const hash = results[0].password;
+                const { type } = results[0];
                 mainHelper.comparePassword(password, hash).then((result) => {
-                    const token = createJwt({ userName });
+                    // only students can create accounts at the moment so they will all be type 2
+                    // teachers will have to be created by the admins
+                    const token = createJwt({ userName, type });
                     res.send({
                         success: result,
                         token,
@@ -52,17 +55,18 @@ router.post('/create_account', (req, res) => {
                             throw err;
                         }
 
+                        // only students can create accounts at the moment
+                        // so they will all be type 2
+                        // teachers will have to be created by the admins
                         if (insertResult.affectedRows === 1) {
-                            const token = createJwt({ userName });
+                            const token = createJwt({ userName, type: 2 });
                             res.send({
                                 success: true,
                                 token,
                             });
                         } else {
-                            const token = createJwt({ userName });
                             res.send({
                                 success: false,
-                                token,
                             });
                         }
                         connection.release();
