@@ -1,4 +1,5 @@
 const express = require('express');
+const mysql = require('mysql');
 
 const router = express.Router();
 const queryDb = require('../../../database/query');
@@ -11,7 +12,7 @@ router.use((req, res, next) => {
     next();
 });
 
-router.post('/submit', (req, res) => {
+router.post('/submit', async (req, res) => {
     const {
         entry,
         imgVal,
@@ -20,10 +21,21 @@ router.post('/submit', (req, res) => {
         creative,
         responsible,
     } = req.body;
-    const query = `INSERT INTO quest_entries (created_by, class_code, quest_id, entry, image, critical, creative, responsible)
-        select id, class_code, '${questId}', '${entry}', ?, ${Number(critical)}, ${Number(creative)}, ${Number(responsible)}
-        from users where username = '${res.userName}'`;
-    queryDb(query, req, res, [imgVal]);
+    try {
+        const query = `INSERT INTO quest_entries (created_by, class_code, quest_id, entry, image, critical, creative, responsible)
+            select id, class_code, '${questId}', '${entry}', ?, ${Number(critical)}, ${Number(creative)}, ${Number(responsible)}
+            from users where username = '${res.userName}'`;
+        const formattedQuery = mysql.format(query, [imgVal]);
+        const result = await awaitQuery.query(formattedQuery);
+        const query2 = `
+            INSERT INTO feedback (created_by, quest_entry_id, comment)
+            SELECT id, '${result.insertId}', 'has answered the quest!'
+            FROM users where username = '${res.userName}'
+        `;
+        await awaitQuery.query(query2);
+    } catch (e) {
+        throw new Error(e);
+    }
 });
 
 router.post('/comment/submit', (req, res) => {

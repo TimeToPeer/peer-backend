@@ -15,34 +15,29 @@ connection.connect((err) => {
     });
 
     mainHelper.createSaltHashPassword('password').then((hashedPassword) => {
-        for (let i = 0; i < 1; i += 1) {
+        for (let i = 0; i < 9; i += 1) {
             sql = `INSERT INTO users (username, password, type, class_code, school_code, personality, name) 
-                    VALUES ('test.teacher1', '${hashedPassword}', '1', '1000', '1000', 'test', 'test teacher1')`;
+                    VALUES ('test.teacher${i}', '${hashedPassword}', '1', '100${i}', '1000', 'test', 'test teacher${i}')`;
 
             connection.query(sql, (err2, result) => {
                 if (err2) throw err2;
                 console.log(err2, result);
             });
 
-            sql = `INSERT INTO users (username, password, type, class_code, school_code, personality, name) 
-                    VALUES ('test.teacher2', '${hashedPassword}', '1', '1001', '1000', 'test', 'test teacher1')`;
+            sql = `INSERT INTO classroom (id, teacher_id, class_name)
+                    VALUES ('100${i}', ${i + 1}, 'pilot class')`;
 
-            connection.query(sql, (err3, result) => {
-                if (err3) throw err3;
-                console.log(err3, result);
+            connection.query(sql, (err2, result) => {
+                if (err2) throw err2;
+                console.log(err2, result);
             });
-        }
 
-        for (let j = 0; j < 60; j += 1) {
-            const name = `test.user${j}`;
-            const nn = `test user${j}`;
-            const classCode = j < 30 ? '1000' : '1001';
-            sql = `INSERT INTO users (username, password, type, class_code, school_code, personality, name) 
-                    VALUES ('${name}', '${hashedPassword}', '2', '${classCode}', '1000', 'test', '${nn}')`;
+            sql = `INSERT INTO quests (class_code, title, description, active)
+                    VALUES ('100${i}', 'Pilot', 'Your QUESTS is...', 1)`;
 
-            connection.query(sql, (err4, result) => {
-                if (err4) throw err4;
-                console.log(err4, result);
+            connection.query(sql, (err2, result) => {
+                if (err2) throw err2;
+                console.log(err2, result);
             });
         }
 
