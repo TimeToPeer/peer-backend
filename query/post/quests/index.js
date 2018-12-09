@@ -2,7 +2,6 @@ const express = require('express');
 const mysql = require('mysql');
 
 const router = express.Router();
-const queryDb = require('../../../database/query');
 const pool = require('../../../database/pool');
 const awaitQuery = require('../../../database/awaitQuery');
 
@@ -33,6 +32,7 @@ router.post('/submit', async (req, res) => {
             FROM users where username = '${res.userName}'
         `;
         await awaitQuery.query(query2);
+        res.send({ success: true });
     } catch (e) {
         throw new Error(e);
     }
