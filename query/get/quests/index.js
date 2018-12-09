@@ -167,6 +167,7 @@ router.post('/classroom', async (req, res) => {
             const classcodeResult = await awaitQuery.query(classcodeQuery);
             const classCode = classcodeResult[0].class_code;
 
+            // get aggregated assessment score
             const query = `
                 SELECT q.created_by, COUNT(*) as post_count, COUNT(teacher_critical) as assessed_count,
                 AVG(NULLIF(critical ,0)) as critical, AVG(NULLIF(creative ,0)) as creative,
@@ -178,6 +179,8 @@ router.post('/classroom', async (req, res) => {
                 WHERE q.quest_id = ${Number(questId)} and u.class_code = '${classCode}'
                 GROUP BY q.created_by
             `;
+
+            // get all users in teacher's classroom
             const query2 = `
                 SELECT id, name FROM users
                 WHERE username != '${res.userName}' AND class_code = '${classCode}'
@@ -188,7 +191,8 @@ router.post('/classroom', async (req, res) => {
                 join quest_entries e on f.quest_entry_id = e.id
                 JOIN users u on u.id = e.created_by
                 WHERE e.quest_id = ${Number(questId)} and u.class_code = '${classCode}'
-                GROUP BY e.created_by
+                GROUP BY e.created_by, f.quest_entry_id
+                ORDER BY e.created_by, MAX(f.created_on) DESC
             `;
             const query4 = `
                 SELECT c.*, e.quest_id, cu.name, cu.icon, CONCAT(cu.name, '  commented on ', pu.name, '\\'s post') as special_text
