@@ -31,9 +31,9 @@ router.post('/submit', async (req, res) => {
     } = req.body;
     try {
         const query = `INSERT INTO quest_entries (created_by, class_code, quest_id, entry, image, critical, creative, responsible)
-            select id, class_code, '${questId}', '${entry}', ?, ${Number(critical)}, ${Number(creative)}, ${Number(responsible)}
+            select id, class_code, '${questId}', ?, ?, ${Number(critical)}, ${Number(creative)}, ${Number(responsible)}
             from users where username = '${res.userName}'`;
-        const formattedQuery = mysql.format(query, [imgVal]);
+        const formattedQuery = mysql.format(query, [entry, imgVal]);
         const result = await awaitQuery.query(formattedQuery);
         const query2 = `
             INSERT INTO feedback (created_by, quest_entry_id, comment)
