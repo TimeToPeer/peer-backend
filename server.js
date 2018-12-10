@@ -2,6 +2,7 @@ require('module-alias/register');
 const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
+const winston = require('winston');
 
 const app = express();
 const getUsers = require('./query/get/users');
@@ -9,6 +10,13 @@ const getQuests = require('./query/get/quests');
 const postUsers = require('./query/post/users');
 const postQuests = require('./query/post/quests');
 const config = require('./config/conf');
+
+const logger = winston.createLogger({
+    level: 'error',
+    transports: [
+        new (winston.transports.File)({ filename: 'error.log' }),
+    ],
+});
 
 app.use(bodyParser.json({ limit: '6mb' }));
 app.use(bodyParser.urlencoded({ limit: '6mb', extended: true }));
@@ -56,4 +64,5 @@ app.listen(8080, () => {});
 
 process.on('uncaughtException', (err) => {
     console.log(err);
+    logger.log('error', err.toString());
 });

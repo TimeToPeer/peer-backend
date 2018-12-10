@@ -25,7 +25,8 @@
 		"express": "^4.16.4",
 		"jsonwebtoken": "^8.4.0",
 		"module-alias": "^2.1.0",
-		"mysql": "^2.16.0"
+		"mysql": "^2.16.0",
+		"winston": "^3.1.0"
 	},
 	"devDependencies": {
 		"eslint": "^5.9.0",

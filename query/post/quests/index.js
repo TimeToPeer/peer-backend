@@ -1,9 +1,18 @@
 const express = require('express');
 const mysql = require('mysql');
+const winston = require('winston');
 
 const router = express.Router();
 const pool = require('../../../database/pool');
 const awaitQuery = require('../../../database/awaitQuery');
+
+const logger = winston.createLogger({
+    level: 'error',
+    transports: [
+        new (winston.transports.File)({ filename: 'error.log' }),
+    ],
+});
+
 
 // middleware that is specific to this router
 router.use((req, res, next) => {
@@ -34,6 +43,7 @@ router.post('/submit', async (req, res) => {
         await awaitQuery.query(query2);
         res.send({ success: true });
     } catch (e) {
+        logger.log('error', e.toString());
         throw new Error(e);
     }
 });
@@ -50,6 +60,7 @@ router.post('/comment/submit', (req, res) => {
     pool.getConnection((err, connection) => {
         if (err) {
             connection.release();
+            logger.log('error', err.toString());
             throw err;
         }
 
@@ -62,7 +73,8 @@ router.post('/comment/submit', (req, res) => {
                 WHERE q.id = ${results.insertId}
             `;
             connection.query(query2, (error2, results2) => {
-                if (error2) throw error;
+                if (error2) throw error2;
+                logger.log('error', error2.toString());
                 res.send(results2);
             });
         });
@@ -82,9 +94,10 @@ router.post('/assessment/feedback', async (req, res) => {
     `;
     const query2 = `
         INSERT INTO feedback (created_by, quest_entry_id, comment)
-        SELECT id, '${id}', '${comment}'
+        SELECT id, '${id}', ?
         FROM users where username = '${res.userName}'
     `;
+    const formattedQuery = mysql.format(query2, [comment]);
     try {
         let entry = {};
         if (critical > 0 && creative > 0 && responsible > 0) {
@@ -96,7 +109,7 @@ router.post('/assessment/feedback', async (req, res) => {
             `;
             entry = await awaitQuery.query(query4);
         }
-        const result = await awaitQuery.query(query2);
+        const result = await awaitQuery.query(formattedQuery);
         const query3 = `SELECT q.*, u.name, u.icon
             FROM feedback q
             JOIN users u on u.id = q.created_by
@@ -108,6 +121,7 @@ router.post('/assessment/feedback', async (req, res) => {
             entry,
         });
     } catch (err) {
+        logger.log('error', err.toString());
         throw new Error(err);
     }
 });

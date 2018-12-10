@@ -1,11 +1,22 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const winston = require('winston');
+
 const mainHelper = require('helper/main-helper');
 const pool = require('../../../database/pool.js');
 const conf = require('../../../config/conf');
 
+
 const router = express.Router();
 const queryDb = require('../../../database/query');
+
+const logger = winston.createLogger({
+    level: 'error',
+    transports: [
+        new (winston.transports.File)({ filename: 'error.log' }),
+    ],
+});
+
 
 // middleware that is specific to this router
 router.use((req, res, next) => {
@@ -22,6 +33,7 @@ router.post('/create_account', (req, res) => {
     pool.getConnection((err, connection) => {
         if (err) {
             connection.release();
+            logger.log('error', err.toString());
             throw err;
         }
 
@@ -52,6 +64,7 @@ router.post('/create_account', (req, res) => {
                     connection.query(query2, (insertError, insertResult) => {
                         if (insertError) {
                             connection.release();
+                            logger.log('error', err.toString());
                             throw err;
                         }
 

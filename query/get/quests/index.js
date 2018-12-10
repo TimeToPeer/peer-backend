@@ -1,9 +1,17 @@
 const express = require('express');
+const winston = require('winston');
 
 const router = express.Router();
 const queryDb = require('../../../database/query');
 const pool = require('../../../database/pool');
 const awaitQuery = require('../../../database/awaitQuery');
+
+const logger = winston.createLogger({
+    level: 'error',
+    transports: [
+        new (winston.transports.File)({ filename: 'error.log' }),
+    ],
+});
 
 // middleware that is specific to this router
 router.use((req, res, next) => {
@@ -69,9 +77,9 @@ router.post('/entry/asessment', async (req, res) => {
         };
         res.send(dataToSend);
     } catch (err) {
+        logger.log('error', err.toString());
         throw new Error(err);
     }
-    // queryDb(query, req, res);
 });
 
 // get entries and comments
@@ -85,11 +93,15 @@ router.post('/entries', (req, res) => {
     pool.getConnection((err, connection) => {
         if (err) {
             connection.release();
+            logger.log('error', err.toString());
             throw err;
         }
 
         connection.query(query, (error, results) => {
-            if (error) throw error;
+            if (error) {
+                logger.log('error', error.toString());
+                throw error;
+            }
             if (results.length > 0) {
                 const entryIds = results.map(el => el.id);
                 const query2 = `SELECT q.*, u.name, u.icon
@@ -99,7 +111,10 @@ router.post('/entries', (req, res) => {
                     order by q.created_on ASC
                 `;
                 connection.query(query2, (error2, results2) => {
-                    if (error2) throw error;
+                    if (error2) {
+                        logger.log('error', error2.toString());
+                        throw error2;
+                    }
                     const dataToSend = {
                         entries: results,
                         comments: results2,
@@ -150,6 +165,7 @@ router.post('/skills', async (req, res) => {
         const result = await awaitQuery.query(query);
         res.send(result);
     } catch (e) {
+        logger.log('error', e.toString());
         throw new Error(e);
     }
 });
@@ -215,6 +231,7 @@ router.post('/classroom', async (req, res) => {
             };
             res.send(dataToSend);
         } catch (e) {
+            logger.log('error', e.toString());
             throw new Error(e);
         }
     } else {
