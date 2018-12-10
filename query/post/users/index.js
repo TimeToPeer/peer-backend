@@ -79,9 +79,9 @@ router.post('/create_account', (req, res) => {
 
 router.post('/update_account', (req, res) => {
     const {
-        name, class_code: classCode, school_code: schoolCode, personality, icon,
+        name, class_code: classCode, personality, icon,
     } = req.body;
-    const query = `UPDATE users SET name='${name}', class_code='${classCode}', school_code='${schoolCode}', personality='${personality}', icon='${icon}' WHERE username='${res.userName}'`;
+    const query = `UPDATE users SET name='${name}', class_code='${classCode}', school_code=0, personality='${personality}', icon='${icon}' WHERE username='${res.userName}'`;
     queryDb(query, req, res);
 });
 
