@@ -33,7 +33,7 @@ connection.connect((err) => {
             });
 
             sql = `INSERT INTO quests (class_code, title, description, active)
-                    VALUES ('100${i}', 'Pilot', 'Your QUESTS is...', 1)`;
+                    VALUES ('100${i}', 'Pilot', 'Your QUEST is...', 1)`;
 
             connection.query(sql, (err2, result) => {
                 if (err2) throw err2;
