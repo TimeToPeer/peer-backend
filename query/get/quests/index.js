@@ -84,7 +84,7 @@ router.post('/entry/asessment', async (req, res) => {
 
 // get entries and comments
 router.post('/entries', (req, res) => {
-    const query = `SELECT q.id, q.created_by, q.created_on, q.class_code, q.quest_id as questId, q.entry, q.image, u.name, u.icon
+    const query = `SELECT q.id, q.created_by, q.created_on, q.class_code, q.quest_id as questId, q.entry, image_url, u.name, u.icon
         FROM quest_entries q
         JOIN users u on u.id = q.created_by
         WHERE q.class_code in (SELECT class_code from users where username = '${res.userName}')

@@ -1,6 +1,8 @@
 const express = require('express');
 const mysql = require('mysql');
 const winston = require('winston');
+const fs = require('fs');
+const crypto = require('crypto');
 
 const router = express.Router();
 const pool = require('../../../database/pool');
@@ -30,18 +32,31 @@ router.post('/submit', async (req, res) => {
         responsible,
     } = req.body;
     try {
-        const query = `INSERT INTO quest_entries (created_by, class_code, quest_id, entry, image, critical, creative, responsible)
-            select id, class_code, '${questId}', ?, ?, ${Number(critical)}, ${Number(creative)}, ${Number(responsible)}
-            from users where username = '${res.userName}'`;
-        const formattedQuery = mysql.format(query, [entry, imgVal]);
-        const result = await awaitQuery.query(formattedQuery);
-        const query2 = `
-            INSERT INTO feedback (created_by, quest_entry_id, comment)
-            SELECT id, '${result.insertId}', 'has answered the quest!'
-            FROM users where username = '${res.userName}'
-        `;
-        await awaitQuery.query(query2);
-        res.send({ success: true });
+        const notImportantSalt = 'abc123';
+        const base64Data = imgVal.replace(/^data:image\/png;base64,/, '');
+        const hash = crypto.createHmac('sha256', notImportantSalt).update(`${res.userName}${imgVal}`).digest('hex');
+        fs.writeFile(`../quest_images/${hash}.png`, base64Data, 'base64', async (err) => {
+            if (err) console.log(err);
+            else {
+                try {
+                    const query = `INSERT INTO quest_entries (created_by, class_code, quest_id, entry, image, critical, creative, responsible, image_url)
+                        select id, class_code, '${questId}', ?, ?, ${Number(critical)}, ${Number(creative)}, ${Number(responsible)}, '${hash}.png'
+                        from users where username = '${res.userName}'`;
+                    const formattedQuery = mysql.format(query, [entry, imgVal]);
+                    const result = await awaitQuery.query(formattedQuery);
+                    const query2 = `
+                        INSERT INTO feedback (created_by, quest_entry_id, comment)
+                        SELECT id, '${result.insertId}', 'has answered the quest!'
+                        FROM users where username = '${res.userName}'
+                    `;
+                    await awaitQuery.query(query2);
+                    res.send({ success: true });
+                } catch (error) {
+                    logger.log('error', error.toString());
+                    throw new Error(error);
+                }
+            }
+        });
     } catch (e) {
         logger.log('error', e.toString());
         throw new Error(e);
