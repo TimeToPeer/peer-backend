@@ -18,7 +18,7 @@ connection.connect((err) => {
             type INT NULL,
             class_code VARCHAR(32) NULL,
             school_code INT NULL,
-            personality VARCHAR(32) NULL,
+            personality VARCHAR(64) NULL,
         PRIMARY KEY(id))
     `;
     connection.query(sql, (queryErr) => {
