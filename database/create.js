@@ -12,6 +12,8 @@ connection.connect((err) => {
             id INT NOT NULL AUTO_INCREMENT,
             username VARCHAR(64) NOT NULL UNIQUE,
             name VARCHAR(256) NULL,
+            first_name VARCHAR(150) NULL,
+            last_name VARCHAR(150) NULL,
             password VARCHAR(256) NOT NULL,
             create_time TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
             icon VARCHAR(64) DEFAULT 0,
@@ -70,6 +72,7 @@ connection.connect((err) => {
             teacher_critical int null,
             teacher_creative int null,
             teacher_responsible int null,
+            image_url varchar(100) null,
         Primary key(id))
     `;
 

@@ -21,11 +21,14 @@ router.use((req, res, next) => {
 
 router.post('/id', (req, res) => {
     const { questId } = req.body;
-    const query = `SELECT q.id as questid, q.class_code, q.title, q.description, q.create_time, c.*, u.name, u.icon
+    const query = `
+        SELECT q.id as questid, q.class_code, q.title, q.description, q.create_time,
+            c.*, u.first_name, u.last_name, u.icon
         FROM peer.quests q
         JOIN peer.classroom c ON q.class_code = c.id
         JOIN peer.users u on u.id = c.teacher_id
-        WHERE q.id = ${questId}`;
+        WHERE q.id = ${questId}
+    `;
     queryDb(query, req, res);
 });
 
@@ -35,7 +38,7 @@ router.post('/entry/asessment', async (req, res) => {
     let query = '';
     if (res.type === 1) {
         query = `
-            SELECT e.*, u.name as name, u.icon, ${res.type} as userType
+            SELECT e.*, u.first_name, u.last_name, u.icon, ${res.type} as userType
             FROM quest_entries e
             JOIN classroom c on c.id = e.class_code
             JOIN users tu on tu.id = c.teacher_id
@@ -44,7 +47,7 @@ router.post('/entry/asessment', async (req, res) => {
         `;
     } else {
         query = `
-            SELECT e.*, u.name, u.icon
+            SELECT e.*, u.first_name, u.last_name, u.icon
             FROM quest_entries e
             JOIN users u on e.created_by = u.id
             WHERE e.id = ${entryId} and u.username = '${res.userName}'
@@ -53,7 +56,7 @@ router.post('/entry/asessment', async (req, res) => {
 
     try {
         const result = await awaitQuery.query(query);
-        const query2 = `SELECT q.*, u.name, u.icon
+        const query2 = `SELECT q.*, u.first_name, u.last_name, u.icon
             FROM quest_comments q
             JOIN users u on u.id = q.created_by
             WHERE q.quest_entry_id = ${result[0].id}
@@ -62,7 +65,7 @@ router.post('/entry/asessment', async (req, res) => {
         const result2 = await awaitQuery.query(query2);
 
         const query3 = `
-                SELECT q.*, u.name, u.icon
+                SELECT q.*, u.first_name, u.last_name, u.icon
                 FROM feedback q
                 JOIN users u on u.id = q.created_by
                 WHERE q.quest_entry_id = (${entryId})
@@ -84,7 +87,8 @@ router.post('/entry/asessment', async (req, res) => {
 
 // get entries and comments
 router.post('/entries', (req, res) => {
-    const query = `SELECT q.id, q.created_by, q.created_on, q.class_code, q.quest_id as questId, q.entry, image_url, u.name, u.icon
+    const query = `SELECT q.id, q.created_by, q.created_on, q.class_code, q.quest_id as questId,
+            q.entry, image_url, u.first_name, u.last_name, u.icon
         FROM quest_entries q
         JOIN users u on u.id = q.created_by
         WHERE q.class_code in (SELECT class_code from users where username = '${res.userName}')
@@ -104,7 +108,7 @@ router.post('/entries', (req, res) => {
             }
             if (results.length > 0) {
                 const entryIds = results.map(el => el.id);
-                const query2 = `SELECT q.*, u.name, u.icon
+                const query2 = `SELECT q.*, u.first_name, u.last_name, u.icon
                     FROM quest_comments q
                     JOIN users u on u.id = q.created_by
                     WHERE q.quest_entry_id in (${entryIds})
@@ -198,7 +202,7 @@ router.post('/classroom', async (req, res) => {
 
             // get all users in teacher's classroom
             const query2 = `
-                SELECT id, name FROM users
+                SELECT id, first_name, last_name FROM users
                 WHERE username != '${res.userName}' AND class_code = '${classCode}'
             `;
             const query3 = `
@@ -211,7 +215,8 @@ router.post('/classroom', async (req, res) => {
                 ORDER BY e.created_by, MAX(f.created_on) DESC
             `;
             const query4 = `
-                SELECT c.*, e.quest_id, cu.name, cu.icon, CONCAT(cu.name, '  commented on ', pu.name, '\\'s post') as special_text
+                SELECT c.*, e.quest_id, cu.name, cu.icon, CONCAT(cu.name, '  commented on ',
+                    pu.first_name, pu.last_name, '\\'s post') as special_text
                 FROM quest_comments c
                 JOIN quest_entries e on e.id = c.quest_entry_id
                 JOIN users cu on cu.id = c.created_by
