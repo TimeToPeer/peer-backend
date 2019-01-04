@@ -215,8 +215,8 @@ router.post('/classroom', async (req, res) => {
                 ORDER BY e.created_by, MAX(f.created_on) DESC
             `;
             const query4 = `
-                SELECT c.*, e.quest_id, cu.name, cu.icon, CONCAT(cu.name, '  commented on ',
-                    pu.first_name, pu.last_name, '\\'s post') as special_text
+                SELECT c.*, e.quest_id, cu.first_name, cu.last_name, cu.icon, CONCAT(cu.first_name, ' ', cu.last_name, '  commented on ',
+                    pu.first_name, ' ', pu.last_name, '\\'s post') as special_text
                 FROM quest_comments c
                 JOIN quest_entries e on e.id = c.quest_entry_id
                 JOIN users cu on cu.id = c.created_by
