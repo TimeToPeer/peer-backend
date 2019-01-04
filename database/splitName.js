@@ -9,18 +9,32 @@ function capitalizeFirstLetter(string) {
 async function SplitName() {
     try {
         const query = `
-            SELECT id, username
+            SELECT id, username, name
             FROM users;
         `;
         const result = await awaitQuery.query(query);
-        console.log(result.length);
         for (let i = 0; i < result.length; i += 1) {
             const { id, username } = result[i];
-            const firstName = capitalizeFirstLetter(username.split('.')[0]);
-            const lastName = capitalizeFirstLetter(username.split('.')[1]);
+            let firstName = '';
+            let lastName = '';
+            let usernameSplit = username.split('.');
+            if (usernameSplit[0]) {
+                firstName = usernameSplit[0];
+            } else {
+                let usernameSplit = username.split(' ');
+                firstName = usernameSplit[0];
+            }
+            if (usernameSplit[usernameSplit.length-1]) {
+                lastName = usernameSplit[usernameSplit.length-1];
+            } else {
+                let usernameSplit = name.split(' ');
+                lastName=usernameSplit[usernameSplit.length-1];
+            }
+            const firstNameFormat = capitalizeFirstLetter(firstName);
+            const lastNameFormat = capitalizeFirstLetter(lastName);
             const query1 = `
                 UPDATE users
-                SET first_name = '${firstName}', last_name='${lastName}'
+                SET first_name = '${firstNameFormat}', last_name='${lastNameFormat}'
                 WHERE id = ${id}
             `;
             try {
