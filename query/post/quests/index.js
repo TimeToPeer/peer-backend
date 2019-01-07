@@ -82,14 +82,17 @@ router.post('/comment/submit', (req, res) => {
         connection.query(query, [comment], (error, results) => {
             if (error) throw error;
             // const shit = results.map(el => el.id);
-            const query2 = `SELECT q.*, u.name, u.icon
+            const query2 = `SELECT q.*, u.first_name, last_name, u.icon
                 FROM quest_comments q
                 JOIN users u on u.id = q.created_by
                 WHERE q.id = ${results.insertId}
             `;
             connection.query(query2, (error2, results2) => {
-                if (error2) throw error2;
-                logger.log('error', error2.toString());
+                if (error2) {
+                    connection.release();
+                    logger.log('error', error2.toString());
+                    throw error2;
+                }
                 res.send(results2);
             });
         });
