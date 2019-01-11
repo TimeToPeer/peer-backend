@@ -112,5 +112,20 @@ connection.connect((err) => {
         if (queryErr) throw err;
     });
 
+    // create comment votes
+    sql = `
+        CREATE TABLE IF NOT EXISTS peer.comment_votes (
+            id int not null AUTO_INCREMENT,
+            created_by int not null,
+            voted_on timestamp null default current_timestamp,
+            comment_id int not null,
+            type VARCHAR(10) null,
+        PRIMARY KEY(id))
+    `;
+
+    connection.query(sql, (queryErr) => {
+        if (queryErr) throw err;
+    });
+
     connection.end();
 });

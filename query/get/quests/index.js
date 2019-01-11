@@ -108,7 +108,7 @@ router.post('/entries', (req, res) => {
             }
             if (results.length > 0) {
                 const entryIds = results.map(el => el.id);
-                const query2 = `SELECT q.*, u.first_name, u.last_name, u.icon
+                const query2 = `SELECT q.*, u.first_name, u.last_name, u.icon, glow_grow
                     FROM quest_comments q
                     JOIN users u on u.id = q.created_by
                     WHERE q.quest_entry_id in (${entryIds})
@@ -119,11 +119,22 @@ router.post('/entries', (req, res) => {
                         logger.log('error', error2.toString());
                         throw error2;
                     }
-                    const dataToSend = {
-                        entries: results,
-                        comments: results2,
-                    };
-                    res.send(dataToSend);
+                    if (results2.length > 0) {
+                        const commentIds = results2.map(el => el.id);
+                        const query3 = `SELECT * FROM comment_votes WHERE comment_id in (${commentIds})`;
+                        connection.query(query3, (error3, results3) => {
+                            if (error3) {
+                                logger.log('error', error3.toString());
+                                throw error3;
+                            }
+                            const dataToSend = {
+                                entries: results,
+                                comments: results2,
+                                votes: results3,
+                            };
+                            res.send(dataToSend);
+                        });
+                    }
                 });
             } else {
                 res.send({});

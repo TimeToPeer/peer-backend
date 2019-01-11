@@ -67,9 +67,10 @@ router.post('/comment/submit', (req, res) => {
     const {
         questEntryId,
         comment,
+        glowGrow,
     } = req.body;
-    const query = `INSERT INTO quest_comments (created_by, quest_entry_id, comment)
-        select id, ${Number(questEntryId)}, ?
+    const query = `INSERT INTO quest_comments (created_by, quest_entry_id, comment, glow_grow)
+        select id, ${Number(questEntryId)}, ?, ${glowGrow}
         from users where username = '${res.userName}'`;
 
     pool.getConnection((err, connection) => {
@@ -81,8 +82,7 @@ router.post('/comment/submit', (req, res) => {
 
         connection.query(query, [comment], (error, results) => {
             if (error) throw error;
-            // const shit = results.map(el => el.id);
-            const query2 = `SELECT q.*, u.first_name, last_name, u.icon
+            const query2 = `SELECT q.*, u.first_name, last_name, u.icon, q.glow_grow
                 FROM quest_comments q
                 JOIN users u on u.id = q.created_by
                 WHERE q.id = ${results.insertId}
@@ -99,6 +99,34 @@ router.post('/comment/submit', (req, res) => {
 
         connection.release();
     });
+});
+
+router.post('/comment/vote', async (req, res) => {
+    const {
+        commentId,
+        type,
+    } = req.body;
+
+    try {
+        const query = `SELECT * FROM comment_votes WHERE comment_id = ${commentId}`;
+        const result = await awaitQuery.query(query);
+        const query2 = `SELECT id FROM users WHERE userName = '${res.userName}'`;
+        const result2 = await awaitQuery.query(query2);
+        const userId = result2[0].id;
+        if (result.length > 0) {
+            // update
+            const query3 = `UPDATE comment_votes SET type = '${type}' WHERE created_by = ${userId} and comment_id = ${commentId}`;
+            await awaitQuery.query(query3);
+        } else {
+            // insert
+            const query4 = `INSERT INTO comment_votes (created_by, comment_id, type) VALUES (${userId}, ${commentId}, '${type}')`;
+            await awaitQuery.query(query4);
+        }
+        res.send({ success: true });
+    } catch (error) {
+        logger.log('error', error.toString());
+        throw new Error(error);
+    }
 });
 
 router.post('/assessment/feedback', async (req, res) => {
@@ -128,7 +156,7 @@ router.post('/assessment/feedback', async (req, res) => {
             entry = await awaitQuery.query(query4);
         }
         const result = await awaitQuery.query(formattedQuery);
-        const query3 = `SELECT q.*, u.name, u.icon
+        const query3 = `SELECT q.*, u.first_name, u.last_name, u.icon
             FROM feedback q
             JOIN users u on u.id = q.created_by
             WHERE q.id = ${result.insertId}
