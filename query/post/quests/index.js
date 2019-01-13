@@ -108,11 +108,11 @@ router.post('/comment/vote', async (req, res) => {
     } = req.body;
 
     try {
-        const query = `SELECT * FROM comment_votes WHERE comment_id = ${commentId}`;
-        const result = await awaitQuery.query(query);
         const query2 = `SELECT id FROM users WHERE userName = '${res.userName}'`;
         const result2 = await awaitQuery.query(query2);
         const userId = result2[0].id;
+        const query = `SELECT * FROM comment_votes WHERE comment_id = ${commentId} and created_by = ${userId}`;
+        const result = await awaitQuery.query(query);
         if (result.length > 0) {
             // update
             const query3 = `UPDATE comment_votes SET type = '${type}' WHERE created_by = ${userId} and comment_id = ${commentId}`;

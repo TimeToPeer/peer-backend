@@ -213,8 +213,8 @@ router.post('/classroom', async (req, res) => {
 
             // get all users in teacher's classroom
             const query2 = `
-                SELECT id, first_name, last_name FROM users
-                WHERE username != '${res.userName}' AND class_code = '${classCode}'
+                SELECT id, username, first_name, last_name FROM users
+                WHERE username != '${res.userName}' AND class_code = '${classCode}' and type != ${res.type}
             `;
             const query3 = `
                 SELECT f.quest_entry_id, e.created_by, MAX(f.created_on) as lastest_feedback
