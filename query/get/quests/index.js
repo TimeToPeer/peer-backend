@@ -134,6 +134,13 @@ router.post('/entries', (req, res) => {
                             };
                             res.send(dataToSend);
                         });
+                    } else {
+                        const dataToSend = {
+                            entries: results,
+                            comments: results2,
+                            votes: [],
+                        };
+                        res.send(dataToSend);
                     }
                 });
             } else {
